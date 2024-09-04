@@ -273,8 +273,22 @@ def get_request():
         sample_values = np.array(extracted_values).reshape(1, -1)
 
         # Load the model and make a prediction
-        model = pickle.load(open('model.pkl', 'rb'))
+        # model = pickle.load(open('model.pkl', 'rb'))
+        model = pickle.load(open('RandomForestModel.pkl', 'rb'))
         prediction = model.predict(sample_values)
+
+        unsafe_predictions = [
+            'ARP_poisioning', 'DDOS_Slowloris', 'DOS_SYN_Hping', 'MQTT_Publish',
+            'Metasploit_Brute_Force_SSH', 'NMAP_FIN_SCAN', 'NMAP_OS_DETECTION',
+            'NMAP_TCP_scan', 'NMAP_UDP_SCAN', 'NMAP_XMAS_TREE_SCAN',
+            'Thing_Speak', 'Wipro_bulb'
+        ]
+
+        # Check if the prediction is in the safe list
+        if prediction[0] in unsafe_predictions:
+            security = "unsafe"
+        else:
+            security = "safe"
 
         # Create an Event object for synchronization
         response_event = threading.Event()
@@ -285,7 +299,8 @@ def get_request():
         # Prepare the message to be sent to Kafka
         message = {
             "correlation_id": correlation_id,
-            "prediction": prediction[0]
+            "prediction": prediction[0],
+            "security":security
         }
         send_to_kafka(classification_topic, message)
 
