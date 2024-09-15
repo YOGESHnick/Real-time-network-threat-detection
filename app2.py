@@ -122,9 +122,9 @@ def get_request():
 
         # Check if the prediction is in the safe list
         if prediction[0] in unsafe_predictions:
-            security = "safe"
-        else:
             security = "unsafe"
+        else:
+            security = "safe"
 
         # Create an Event object for synchronization
         response_event = threading.Event()
